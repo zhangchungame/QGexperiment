@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    <script src="./static/js/d3.js"></script>
+</head>
+<body>
+<div style="width: 300px;position: fixed;top:0;left:50px;border:1px solid black">
+    <label>密度(g/cm<span style="font-size: 8px;margin-top:-30px;">3</span>) </label><br>
+    <input type="text"><br>
+    <label>含水量</label><br>
+    <input type="text"><br>
+    <label>土比重</label><br>
+    <input type="text"><br>
+    <label>初始高度</label><br>
+    <input type="text"><br>
+</div>
+<script>
+    var num = [{x: 150, y: 250},
+        {x: 400, y: 250},
+        {x: 150, y: 450},
+        {x: 400, y: 450}];
+    var colorText=[
+        "红色",
+        "蓝色",
+        "黑色",
+        "绿色",
+    ]
+    var currentNum=3;
+    var svg = d3.select("body").append("svg").attr("width", "100%").attr("height", "800px").attr("fill", "blue");
+
+    var zhongxin_x = parseInt(svg.style("width")) / 2;
+    svg.append("line").attr("x1", zhongxin_x).attr("y1", 0).attr("x2", zhongxin_x).attr("y2", 800).attr("stroke", "rgb(255,0,0)");
+    svg.append("ellipse").attr("class", "canmove").attr("num", 0).attr("cx", num[0].x).attr("cy", num[0].y).attr("rx", 60).attr("ry", 30).attr("fill", "red");
+    svg.append("ellipse").attr("class", "canmove").attr("num", 1).attr("cx", num[1].x).attr("cy", num[1].y).attr("rx", 80).attr("ry", 40).attr("fill", "blue");
+    svg.append("ellipse").attr("class", "canmove").attr("num", 2).attr("cx", num[2].x).attr("cy", num[2].y).attr("rx", 100).attr("ry", 50).attr("fill", "black");
+    svg.append("ellipse").attr("class", "canmove").attr("num", 3).attr("cx", num[3].x).attr("cy", num[3].y).attr("rx", 120).attr("ry", 60).attr("fill", "green");
+    var textshow=svg.append("text").attr("x", 50).attr("y", 750).text("请移动绿色到右边");
+
+    d3.selectAll(".canmove").call(d3.drag().on("start", started));
+
+    function started() {
+        var circle = d3.select(this).classed("dragging", true);
+
+        d3.event.on("drag", dragged).on("end", ended);
+
+        function dragged(d) {
+            circle.raise().attr("cx", d3.event.x).attr("cy", d3.event.y);
+        }
+
+        function ended() {
+            if (circle.attr("num")==currentNum&&parseInt(circle.attr("cx")) > zhongxin_x) {
+                currentNum--
+                circle.attr("cx",zhongxin_x+200).attr("cy",500);
+                circle.call(d3.drag().on("start", null));
+                textshow.text("请移动"+colorText[currentNum]+"到右边");
+            }else{
+                alert("先动"+colorText[currentNum]);
+                circle.attr("cx",num[circle.attr("num")].x).attr("cy",num[circle.attr("num")].y);
+            }
+            if(currentNum<0){
+                d3.selectAll(".canmove").call(d3.drag().on("start", null));
+                textshow.text("作业完成");
+            }
+            circle.classed("dragging", false);
+        }
+    }
+</script>
+</body>
+</html>
